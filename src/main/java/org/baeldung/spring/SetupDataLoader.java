@@ -47,12 +47,15 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         final Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
         final Privilege writePrivilege = createPrivilegeIfNotFound("WRITE_PRIVILEGE");
         final Privilege passwordPrivilege = createPrivilegeIfNotFound("CHANGE_PASSWORD_PRIVILEGE");
+        final Privilege createRolePrivilege = createPrivilegeIfNotFound("CREATE_NEW_ROLE");
 
         // == create initial roles
         final List<Privilege> adminPrivileges = Arrays.asList(readPrivilege, writePrivilege, passwordPrivilege);
         final List<Privilege> userPrivileges = Arrays.asList(readPrivilege, passwordPrivilege);
+        final List<Privilege> managerPrivileges = Arrays.asList(readPrivilege, writePrivilege, createRolePrivilege);
         createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
         createRoleIfNotFound("ROLE_USER", userPrivileges);
+        createRoleIfNotFound("ROLE_MANAGER",managerPrivileges);
 
         final Role adminRole = roleRepository.findByName("ROLE_ADMIN");
         final User user = new User();
@@ -63,6 +66,17 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         user.setRoles(Arrays.asList(adminRole));
         user.setEnabled(true);
         userRepository.save(user);
+        
+        
+        final Role managerRole = roleRepository.findByName("ROLE_MANAGER");
+        final User user_manager = new User();
+        user_manager.setFirstName("manager");
+        user_manager.setLastName("Test");
+        user_manager.setPassword(passwordEncoder.encode("test"));
+        user_manager.setEmail("manager@test.com");
+        user_manager.setRoles(Arrays.asList(managerRole));
+        user_manager.setEnabled(true);
+        userRepository.save(user_manager);
 
         alreadySetup = true;
     }
